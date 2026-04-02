@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FITPLAN — Tu Plan Personalizado</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #ff6b00;
+    --accent2: #ff9d00;
+    --accent3: #ff4500;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --danger: #ff4757;
+    --warn: #ffa502;
+    --success: #2ed573;
+    --grad: linear-gradient(135deg, #ff6b00 0%, #ff9d00 55%, #ffffff 100%);
+    --grad-btn: linear-gradient(135deg, #ff4500 0%, #ff6b00 45%, #ff9d00 75%, rgba(255,255,255,0.85) 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-top: 44px;
+  }
+
+  /* FONDO — opción C: difuminado blanco arriba-derecha + naranja abajo-izquierda */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -10%; right: -10%;
+    width: 550px; height: 550px;
+    background: radial-gradient(ellipse at top right, rgba(255,255,255,0.055) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -15%; left: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(ellipse at bottom left, rgba(255,107,0,0.08) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ===== INSTAGRAM BAR FIJA (top) ===== */
+  .ig-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(10,10,15,0.92);
+    border-bottom: 1px solid rgba(255,107,0,0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .ig-icon-wrap {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ig-icon-wrap svg { width: 13px; height: 13px; fill: #fff; }
+  .ig-topbar-text { font-size: 12px; color: rgba(255,255,255,0.45); }
+  .ig-topbar-handle {
+    font-size: 12px; font-weight: 700;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+  }
+  .ig-topbar-handle:hover { opacity: 0.85; }
+
+  /* ===== HERO ===== */
+  .hero {
+    text-align: center;
+    padding: 52px 20px 36px;
+    position: relative; z-index: 1;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    border: 1px solid rgba(255,107,0,0.3);
+    padding: 6px 16px; border-radius: 20px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.6s ease;
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 12vw, 108px);
+    line-height: 0.9; letter-spacing: 3px;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: fadeUp 0.8s ease;
+  }
+  .hero p {
+    color: var(--muted); font-size: 16px;
+    margin-top: 16px; max-width: 500px;
+    margin-left: auto; margin-right: auto;
+    animation: fadeUp 1s ease;
+  }
+
+  /* ===== PROGRESS ===== */
+  .progress-bar {
+    display: flex; justify-content: center; align-items: center;
+    gap: 0; padding: 30px 20px; position: relative; z-index: 1;
+  }
+  .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
+    color: var(--muted); transition: all 0.4s ease; background: var(--surface);
+  }
+  .step-circle.active {
+    border-color: #ff6b00; color: #ff8c00;
+    background: rgba(255,107,0,0.1);
+    box-shadow: 0 0 20px rgba(255,107,0,0.25);
+  }
+  .step-circle.done {
+    border-color: #ff6b00;
+    background: linear-gradient(135deg, #ff6b00, #ff9d00);
+    color: #000;
+  }
+  .step-label {
+    font-size: 10px; color: var(--muted); text-align: center;
+    font-family: 'Space Mono', monospace; letter-spacing: 1px;
+    text-transform: uppercase; max-width: 60px;
+  }
+  .step-line {
+    width: 40px; height: 2px; background: var(--border);
+    margin-bottom: 22px; transition: background 0.4s ease;
+  }
+  .step-line.done { background: linear-gradient(90deg, #ff6b00, #ff9d00); }
+
+  /* ===== CONTAINER ===== */
+  .container {
+    max-width: 640px; margin: 0 auto;
+    padding: 0 20px 100px; position: relative; z-index: 1;
+  }
+  .section { display: none; animation: sectionIn 0.5s ease; }
+  .section.active { display: block; }
+  @keyframes sectionIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #ff6b00, #ff9d00 70%, rgba(255,255,255,0.5));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .card:focus-within::before { opacity: 1; }
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 1px; margin-bottom: 6px;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .card-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  /* ===== FORM ===== */
+  .form-group { margin-bottom: 20px; }
+  label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 8px;
+  }
+  input[type="number"], input[type="text"], select {
+    width: 100%; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 14px 18px; font-family: 'DM Sans', sans-serif;
+    font-size: 16px; color: var(--text); outline: none; transition: all 0.3s ease;
+  }
+  input:focus, select:focus {
+    border-color: #ff6b00; box-shadow: 0 0 0 4px rgba(255,107,0,0.08);
+  }
+  input::placeholder { color: var(--muted); }
+  select option { background: var(--surface); }
+
+  /* ===== UNIT TOGGLE ===== */
+  .unit-toggle {
+    display: flex; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+  .unit-btn {
+    flex: 1; padding: 12px; text-align: center; cursor: pointer;
+    font-size: 14px; font-weight: 600; color: var(--muted);
+    transition: all 0.3s; border: none; background: transparent;
+  }
+  .unit-btn.active { background: linear-gradient(135deg, #ff6b00, #ff9d00); color: #000; }
+
+  /* ===== RADIO CARDS ===== */
+  .radio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .radio-card { cursor: pointer; position: relative; }
+  .radio-card input { display: none; }
+  .radio-label {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; padding: 16px 10px; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: 14px;
+    font-size: 12px; font-weight: 600; text-align: center;
+    color: var(--muted); cursor: pointer; transition: all 0.3s;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .radio-label .icon { font-size: 24px; }
+  .radio-card input:checked + .radio-label {
+    border-color: #ff6b00; background: rgba(255,107,0,0.08); color: #ff9d00;
+  }
+
+  /* ===== SLIDER ===== */
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 6px;
+    border-radius: 3px; background: var(--border); outline: none; padding: 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b00, #ff9d00);
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(255,107,0,0.5);
+  }
+  .slider-value {
+    text-align: center; font-family: 'Space Mono', monospace;
+    font-size: 32px; font-weight: 700; margin-bottom: 10px;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .slider-unit { font-size: 14px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+  .slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-top: 8px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: block; width: 100%; padding: 18px; border: none;
+    border-radius: 14px; font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .btn-primary { background: var(--grad-btn); color: #000; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255,107,0,0.35); }
+  .btn-secondary {
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--muted); font-size: 16px; margin-top: 10px;
+  }
+  .btn-secondary:hover { border-color: #ff6b00; color: #ff9d00; }
+  .btn-copy { background: var(--grad-btn); color: #000; font-size: 20px; padding: 20px; }
+  .btn-copy:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255,107,0,0.35); }
+
+  /* ===== IMC ===== */
+  .imc-display { text-align: center; padding: 30px 0; }
+  .imc-number {
+    font-family: 'Bebas Neue', sans-serif; font-size: 96px; line-height: 1; letter-spacing: 2px;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .imc-label {
+    font-size: 16px; font-weight: 600; margin-top: 6px;
+    padding: 8px 20px; border-radius: 20px; display: inline-block;
+  }
+  .imc-label.bajo { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+  .imc-label.normal { background: rgba(46,213,115,0.15); color: var(--success); }
+  .imc-label.sobrepeso { background: rgba(255,165,2,0.15); color: var(--warn); }
+  .imc-label.obesidad1 { background: rgba(255,71,87,0.15); color: var(--danger); }
+  .imc-label.obesidad2 { background: rgba(255,0,50,0.2); color: #ff1744; }
+  .imc-bar-wrap { margin: 20px 0; position: relative; }
+  .imc-bar {
+    height: 14px; border-radius: 7px;
+    background: linear-gradient(90deg, #ffffff 0%, #2ed573 22%, #ffa502 44%, #ff4757 66%, #c0392b 100%);
+    position: relative;
+  }
+  .imc-pointer {
+    position: absolute; top: -8px;
+    width: 30px; height: 30px; background: #fff;
+    border-radius: 50%; border: 3px solid #ff6b00;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 15px rgba(255,107,0,0.5);
+    transition: left 0.8s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .imc-bar-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 10px; font-size: 10px; color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ===== STATS ===== */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 20px 0; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; text-align: center;
+  }
+  .stat-value {
+    font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ===== CHIPS ===== */
+  .profile-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .chip {
+    background: rgba(255,107,0,0.08); border: 1px solid rgba(255,107,0,0.25);
+    border-radius: 20px; padding: 6px 14px; font-size: 12px;
+    color: #ff9d00; font-family: 'Space Mono', monospace;
+  }
+
+  /* ===== PROMPT BOX ===== */
+  .prompt-box {
+    background: #0d0d14; border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 24px;
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    line-height: 1.8; color: #a0a0c0; white-space: pre-wrap;
+    word-break: break-word; max-height: 400px; overflow-y: auto;
+  }
+  .prompt-box::-webkit-scrollbar { width: 4px; }
+  .prompt-box::-webkit-scrollbar-track { background: transparent; }
+  .prompt-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .prompt-highlight { color: #ff9d00; font-weight: 700; }
+  .prompt-section { color: rgba(255,255,255,0.5); }
+
+  /* ===== TOAST ===== */
+  .copy-toast {
+    display: none; text-align: center; padding: 12px;
+    background: rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.3);
+    border-radius: 10px; color: #ff9d00; font-size: 14px;
+    font-weight: 600; margin-top: 12px;
+  }
+
+  /* ===== MISC ===== */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .alert { border-radius: 12px; padding: 14px 18px; font-size: 13px; margin-top: 16px; line-height: 1.6; }
+  .alert-info { background: rgba(255,107,0,0.07); border: 1px solid rgba(255,107,0,0.2); color: #ff9d00; }
+  .alert-warn { background: rgba(255,165,2,0.08); border: 1px solid rgba(255,165,2,0.2); color: var(--warn); }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .section-num {
+    font-family: 'Space Mono', monospace; font-size: 11px; color: #ff8c00;
+    background: rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.25);
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* ===== INSTAGRAM FOOTER ===== */
+  .ig-footer {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 16px 20px;
+    background: rgba(10,10,15,0.9);
+    border-top: 1px solid rgba(255,107,0,0.12);
+    margin-top: 20px;
+  }
+  .ig-footer-text { font-size: 12px; color: rgba(255,255,255,0.35); }
+  .ig-footer-handle {
+    font-size: 12px; font-weight: 700; text-decoration: none;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .ig-footer-handle:hover { opacity: 0.8; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center; padding: 30px 20px 10px; color: var(--muted);
+    font-size: 12px; position: relative; z-index: 1;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .card { padding: 20px; }
+    .radio-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .imc-number { font-size: 72px; }
+    .step-line { width: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- INSTAGRAM TOP BAR FIJA -->
+<div class="ig-topbar">
+  <div class="ig-icon-wrap">
+    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+  </div>
+  <span class="ig-topbar-text">Síguenos en Instagram →</span>
+  <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" class="ig-topbar-handle">@mejiatian4</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✦ Calculadora Fitness ✦</div>
+  <h1>FITPLAN</h1>
+  <p>Ingresa tus datos y obtén un plan personalizado con rutina de entrenamiento y nutrición generado por inteligencia artificial.</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar" id="progressBar">
+  <div class="step-item">
+    <div class="step-circle active" id="sc1">1</div>
+    <div class="step-label">Perfil</div>
+  </div>
+  <div class="step-line" id="sl1"></div>
+  <div class="step-item">
+    <div class="step-circle" id="sc2">2</div>
+    <div class="step-label">Cuerpo</div>
+  </div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step-item">
+    <div class="step-circle" id="sc3">3</div>
+    <div class="step-label">Entreno</div>
+  </div>
+  <div class="step-line" id="sl3"></div>
+  <div class="step-item">
+    <div class="step-circle" id="sc4">4</div>
+    <div class="step-label">IMC</div>
+  </div>
+  <div class="step-line" id="sl4"></div>
+  <div class="step-item">
+    <div class="step-circle" id="sc5">★</div>
+    <div class="step-label">Plan</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SECCIÓN 1: PERFIL -->
+  <div class="section active" id="sec1">
+    <div class="section-header">
+      <span class="section-num">PASO 01</span>
+      <span class="section-title">Tu Perfil</span>
+    </div>
+    <div class="card">
+      <div class="form-group">
+        <label>¿Cuántos años tienes?</label>
+        <div class="slider-value" id="ageDisplay">25 <span class="slider-unit">años</span></div>
+        <input type="range" id="ageSlider" min="10" max="85" value="25" oninput="updateSlider('age')">
+        <div class="slider-labels"><span>10 años</span><span>85 años</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="form-group">
+        <label>Sexo Biológico</label>
+        <div class="radio-grid">
+          <label class="radio-card">
+            <input type="radio" name="sexo" value="masculino" checked>
+            <div class="radio-label"><span class="icon">♂</span>Masculino</div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="sexo" value="femenino">
+            <div class="radio-label"><span class="icon">♀</span>Femenino</div>
+          </label>
+        </div>
+        <div class="alert alert-info" style="margin-top:12px;">
+          💡 El sexo biológico afecta el cálculo del metabolismo, la composición corporal óptima y las recomendaciones de calorías.
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="goTo(2)">CONTINUAR →</button>
+    <div class="ig-footer">
+      <div class="ig-icon-wrap" style="width:18px;height:18px;">
+        <svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:#fff;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </div>
+      <span class="ig-footer-text">Más contenido fitness →</span>
+      <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" class="ig-footer-handle">@mejiatian4</a>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: CUERPO -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <span class="section-num">PASO 02</span>
+      <span class="section-title">Tu Cuerpo</span>
+    </div>
+    <div class="card">
+      <div class="card-title">Estatura</div>
+      <div class="card-sub">¿Cuánto mides?</div>
+      <div class="unit-toggle" style="margin-bottom:20px;">
+        <button class="unit-btn active" id="cmBtn" onclick="setHeightUnit('cm')">Centímetros</button>
+        <button class="unit-btn" id="ftBtn" onclick="setHeightUnit('ft')">Pies / Pulgadas</button>
+      </div>
+      <div id="heightCm">
+        <div class="slider-value" id="heightDisplay">170 <span class="slider-unit">cm</span></div>
+        <input type="range" id="heightSlider" min="130" max="220" value="170" oninput="updateSlider('height')">
+        <div class="slider-labels"><span>1.30 m</span><span>2.20 m</span></div>
+      </div>
+      <div id="heightFt" style="display:none;">
+        <div style="display:flex;gap:12px;">
+          <div class="form-group" style="flex:1;">
+            <label>Pies</label>
+            <input type="number" id="feetInput" min="4" max="7" value="5" oninput="convertFtToCm()">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Pulgadas</label>
+            <input type="number" id="inchesInput" min="0" max="11" value="7" oninput="convertFtToCm()">
+          </div>
+        </div>
+        <div style="text-align:center;color:#ff9d00;font-family:'Space Mono',monospace;font-size:14px;" id="ftConversion">≈ 170 cm</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Peso</div>
+      <div class="card-sub">¿Cuánto pesas?</div>
+      <div class="unit-toggle" style="margin-bottom:20px;">
+        <button class="unit-btn active" id="kgBtn" onclick="setWeightUnit('kg')">Kilogramos</button>
+        <button class="unit-btn" id="lbBtn" onclick="setWeightUnit('lb')">Libras</button>
+      </div>
+      <div class="slider-value" id="weightDisplay">70 <span class="slider-unit" id="weightUnitLabel">kg</span></div>
+      <input type="range" id="weightSlider" min="30" max="200" value="70" oninput="updateSlider('weight')">
+      <div class="slider-labels" id="weightLabels"><span>30 kg</span><span>200 kg</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Somatotipo</div>
+      <div class="card-sub">¿Cómo describirías tu tipo de cuerpo naturalmente?</div>
+      <div class="radio-grid" style="grid-template-columns:repeat(3,1fr);">
+        <label class="radio-card">
+          <input type="radio" name="somato" value="ectomorfo" checked>
+          <div class="radio-label"><span class="icon">🏃</span>Ectomorfo<span style="font-size:9px;font-weight:400;color:#555;margin-top:2px;">Delgado, difícil ganar peso</span></div>
+        </label>
+        <label class="radio-card">
+          <input type="radio" name="somato" value="mesomorfo">
+          <div class="radio-label"><span class="icon">💪</span>Mesomorfo<span style="font-size:9px;font-weight:400;color:#555;margin-top:2px;">Atlético, músculos definidos</span></div>
+        </label>
+        <label class="radio-card">
+          <input type="radio" name="somato" value="endomorfo">
+          <div class="radio-label"><span class="icon">🏋️</span>Endomorfo<span style="font-size:9px;font-weight:400;color:#555;margin-top:2px;">Tendencia a ganar grasa</span></div>
+        </label>
+      </div>
+      <div class="alert alert-info" style="margin-top:14px;">
+        💡 <strong>¿No sabes cuál eres?</strong><br>
+        • <strong>Ectomorfo:</strong> eres naturalmente delgado/a, huesos pequeños, difícil ganar músculo.<br>
+        • <strong>Mesomorfo:</strong> ganas músculo fácilmente, buena constitución atlética natural.<br>
+        • <strong>Endomorfo:</strong> tendencia a acumular grasa, especialmente en abdomen y cadera.
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="goTo(3)">CONTINUAR →</button>
+    <button class="btn btn-secondary" onclick="goTo(1)">← Volver</button>
+    <div class="ig-footer">
+      <div class="ig-icon-wrap" style="width:18px;height:18px;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:#fff;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div>
+      <span class="ig-footer-text">Más contenido fitness →</span>
+      <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" class="ig-footer-handle">@mejiatian4</a>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: ENTRENAMIENTO -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <span class="section-num">PASO 03</span>
+      <span class="section-title">Tu Entrenamiento</span>
+    </div>
+    <div class="card">
+      <div class="card-title">Días de Entrenamiento</div>
+      <div class="card-sub">¿Cuántos días a la semana entrenas actualmente?</div>
+      <div class="slider-value" id="daysDisplay">3 <span class="slider-unit">días/semana</span></div>
+      <input type="range" id="daysSlider" min="0" max="6" value="3" step="1" oninput="updateSlider('days')">
+      <div class="slider-labels"><span>0 (Sedentario)</span><span>6 días</span></div>
+      <div id="daysDescBox" class="alert alert-info" style="margin-top:16px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Objetivo Principal</div>
+      <div class="card-sub">¿Qué quieres lograr?</div>
+      <div class="radio-grid" style="grid-template-columns:repeat(2,1fr);">
+        <label class="radio-card"><input type="radio" name="objetivo" value="perder_grasa" checked><div class="radio-label"><span class="icon">🔥</span>Perder Grasa</div></label>
+        <label class="radio-card"><input type="radio" name="objetivo" value="ganar_musculo"><div class="radio-label"><span class="icon">💪</span>Ganar Músculo</div></label>
+        <label class="radio-card"><input type="radio" name="objetivo" value="definicion"><div class="radio-label"><span class="icon">⚡</span>Definición</div></label>
+        <label class="radio-card"><input type="radio" name="objetivo" value="salud_general"><div class="radio-label"><span class="icon">❤️</span>Salud General</div></label>
+        <label class="radio-card"><input type="radio" name="objetivo" value="resistencia"><div class="radio-label"><span class="icon">🏃</span>Resistencia</div></label>
+        <label class="radio-card"><input type="radio" name="objetivo" value="fuerza"><div class="radio-label"><span class="icon">🏋️</span>Fuerza Máx.</div></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Nivel de Experiencia</div>
+      <div class="radio-grid">
+        <label class="radio-card"><input type="radio" name="nivel" value="principiante" checked><div class="radio-label"><span class="icon">🌱</span>Principiante<span style="font-size:9px;color:#555;">0–6 meses</span></div></label>
+        <label class="radio-card"><input type="radio" name="nivel" value="intermedio"><div class="radio-label"><span class="icon">⚙️</span>Intermedio<span style="font-size:9px;color:#555;">6m – 2 años</span></div></label>
+        <label class="radio-card"><input type="radio" name="nivel" value="avanzado"><div class="radio-label"><span class="icon">🏆</span>Avanzado<span style="font-size:9px;color:#555;">2+ años</span></div></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Equipamiento Disponible</div>
+      <div class="radio-grid" style="grid-template-columns:repeat(3,1fr);">
+        <label class="radio-card"><input type="radio" name="equipo" value="gym_completo" checked><div class="radio-label"><span class="icon">🏋️</span>Gym Completo</div></label>
+        <label class="radio-card"><input type="radio" name="equipo" value="mancuernas"><div class="radio-label"><span class="icon">🔵</span>Mancuernas</div></label>
+        <label class="radio-card"><input type="radio" name="equipo" value="cuerpo"><div class="radio-label"><span class="icon">🤸</span>Sin Equipo</div></label>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="calcularIMC()">CALCULAR IMC →</button>
+    <button class="btn btn-secondary" onclick="goTo(2)">← Volver</button>
+    <div class="ig-footer">
+      <div class="ig-icon-wrap" style="width:18px;height:18px;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:#fff;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div>
+      <span class="ig-footer-text">Más contenido fitness →</span>
+      <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" class="ig-footer-handle">@mejiatian4</a>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4: IMC -->
+  <div class="section" id="sec4">
+    <div class="section-header">
+      <span class="section-num">PASO 04</span>
+      <span class="section-title">Tu IMC</span>
+    </div>
+    <div class="card">
+      <div class="imc-display">
+        <div class="imc-number" id="imcValue">—</div>
+        <div class="imc-label" id="imcLabel">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px;" id="imcDesc"></div>
+      </div>
+      <div class="imc-bar-wrap">
+        <div class="imc-bar"><div class="imc-pointer" id="imcPointer" style="left:0%"></div></div>
+        <div class="imc-bar-labels">
+          <span>Bajo Peso<br>&lt;18.5</span>
+          <span>Normal<br>18.5–24.9</span>
+          <span>Sobrepeso<br>25–29.9</span>
+          <span>Obesidad I<br>30–34.9</span>
+          <span>Obesidad II<br>≥35</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tu Resumen Físico</div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="divider"></div>
+      <div class="card-sub">Perfil detectado</div>
+      <div class="profile-chips" id="profileChips"></div>
+      <div class="alert" id="metabolicAlert"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">¿Qué significa tu IMC?</div>
+      <div id="imcExplanation" style="font-size:14px;line-height:1.8;color:var(--muted);"></div>
+    </div>
+    <button class="btn btn-primary" onclick="generarPrompt()">GENERAR MI PLAN ✦</button>
+    <button class="btn btn-secondary" onclick="goTo(3)">← Volver</button>
+    <div class="ig-footer">
+      <div class="ig-icon-wrap" style="width:18px;height:18px;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:#fff;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div>
+      <span class="ig-footer-text">Más contenido fitness →</span>
+      <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" class="ig-footer-handle">@mejiatian4</a>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5: PROMPT -->
+  <div class="section" id="sec5">
+    <div class="section-header">
+      <span class="section-num">PASO 05</span>
+      <span class="section-title">Tu Plan</span>
+    </div>
+    <div class="card">
+      <div class="card-title">¡Listo! 🎉</div>
+      <div class="card-sub">Copia este prompt y pégalo en cualquier IA (ChatGPT, Claude, Gemini) para obtener tu plan completo en HTML con rutinas de lunes a sábado y nutrición de lunes a domingo.</div>
+      <div class="divider"></div>
+      <div class="prompt-box" id="promptBox"></div>
+      <div class="copy-toast" id="copyToast">✅ ¡Prompt copiado! Ahora pégalo en tu IA favorita.</div>
+    </div>
+    <button class="btn btn-copy" onclick="copyPrompt()">📋 COPIAR PROMPT COMPLETO</button>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title" style="font-size:20px;">📌 ¿Cómo usar este prompt?</div>
+      <ol style="padding-left:20px;font-size:14px;line-height:2.2;color:var(--muted);">
+        <li>Presiona el botón <strong style="color:var(--text);">COPIAR PROMPT</strong> de arriba.</li>
+        <li>Abre <strong style="color:#ff9d00;">ChatGPT, Claude o Gemini</strong> en tu navegador.</li>
+        <li>Pega el prompt con <strong style="color:var(--text);">Ctrl+V</strong> y envíalo.</li>
+        <li>La IA generará un <strong style="color:#ff9d00;">archivo HTML completo</strong> con tu plan personalizado.</li>
+        <li>Guárdalo como <strong style="color:var(--text);">miplan.html</strong> y ábrelo en tu navegador.</li>
+      </ol>
+      <div class="alert alert-warn" style="margin-top:12px;">
+        ⚠️ Este plan es orientativo. Consulta con un médico, nutricionista o entrenador certificado antes de iniciar.
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="goTo(1); resetAll()">🔄 Calcular de nuevo</button>
+    <div class="ig-footer">
+      <div class="ig-icon-wrap" style="width:18px;height:18px;"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:#fff;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></div>
+      <span class="ig-footer-text">Síguenos →</span>
+      <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" class="ig-footer-handle">@mejiatian4</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">FITPLAN</strong> — Calculadora de IMC y Generador de Planes Fitness<br>
+  <span style="font-size:10px;">Los resultados son orientativos. Consulta siempre con profesionales de la salud.</span><br><br>
+  <a href="https://www.instagram.com/mejiatian4" target="_blank" rel="noopener" style="color:#ff9d00;font-size:11px;text-decoration:none;">📸 instagram.com/mejiatian4</a>
+</footer>
+
+<script>
+let st = {
+  age:25, height:170, weight:70, sexo:'masculino',
+  somato:'ectomorfo', dias:3, objetivo:'perder_grasa',
+  nivel:'principiante', equipo:'gym_completo',
+  heightUnit:'cm', weightUnit:'kg',
+  _imc:0, _cat:'', _tdee:0, _pesoIdeal:0, _grasaEst:0, _peso:70, _prompt:''
+};
+
+function goTo(step) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec' + step).classList.add('active');
+  updateProgress(step);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress(step) {
+  for (let i = 1; i <= 5; i++) {
+    const c = document.getElementById('sc' + i);
+    c.classList.remove('active','done');
+    if (i < step) { c.classList.add('done'); c.textContent = '✓'; }
+    else if (i === step) { c.classList.add('active'); c.textContent = i === 5 ? '★' : i; }
+    else c.textContent = i === 5 ? '★' : i;
+    if (i < 5) document.getElementById('sl' + i).classList.toggle('done', i < step);
+  }
+}
+
+function updateSlider(type) {
+  if (type === 'age') {
+    st.age = +document.getElementById('ageSlider').value;
+    document.getElementById('ageDisplay').innerHTML = st.age + ' <span class="slider-unit">años</span>';
+  }
+  if (type === 'height') {
+    st.height = +document.getElementById('heightSlider').value;
+    document.getElementById('heightDisplay').innerHTML = st.height + ' <span class="slider-unit">cm</span>';
+  }
+  if (type === 'weight') {
+    const raw = +document.getElementById('weightSlider').value;
+    st.weight = raw;
+    document.getElementById('weightDisplay').innerHTML = raw + ' <span class="slider-unit" id="weightUnitLabel">' + st.weightUnit + '</span>';
+  }
+  if (type === 'days') {
+    st.dias = +document.getElementById('daysSlider').value;
+    document.getElementById('daysDisplay').innerHTML = st.dias + ' <span class="slider-unit">días/semana</span>';
+    updateDaysDesc();
+  }
+}
+
+function updateDaysDesc() {
+  const d = ['😴 Sedentario — No realizas actividad física regular.','🚶 Muy ligero — Algo de movimiento 1 vez/semana.','🚴 Ligero — Actividad moderada 2 veces por semana.','⚡ Moderado — Entrenas regularmente 3 veces/semana.','💪 Activo — Entrenamiento frecuente, buen hábito.','🔥 Muy Activo — Entrenamiento intenso casi todos los días.','🏆 Atlético — Entrenamiento diario de alta intensidad.'];
+  document.getElementById('daysDescBox').textContent = d[st.dias];
+}
+
+function setHeightUnit(unit) {
+  st.heightUnit = unit;
+  document.getElementById('cmBtn').classList.toggle('active', unit==='cm');
+  document.getElementById('ftBtn').classList.toggle('active', unit==='ft');
+  document.getElementById('heightCm').style.display = unit==='cm' ? 'block' : 'none';
+  document.getElementById('heightFt').style.display = unit==='ft' ? 'block' : 'none';
+}
+
+function convertFtToCm() {
+  const ft = +document.getElementById('feetInput').value || 0;
+  const inc = +document.getElementById('inchesInput').value || 0;
+  st.height = Math.round((ft * 30.48) + (inc * 2.54));
+  document.getElementById('ftConversion').textContent = '≈ ' + st.height + ' cm';
+}
+
+function setWeightUnit(unit) {
+  st.weightUnit = unit;
+  document.getElementById('kgBtn').classList.toggle('active', unit==='kg');
+  document.getElementById('lbBtn').classList.toggle('active', unit==='lb');
+  const slider = document.getElementById('weightSlider');
+  if (unit === 'lb') {
+    slider.min = 66; slider.max = 440;
+    slider.value = Math.round(st.weight * 2.205);
+    document.getElementById('weightLabels').innerHTML = '<span>66 lb</span><span>440 lb</span>';
+  } else {
+    slider.min = 30; slider.max = 200;
+    slider.value = st.weight <= 200 ? st.weight : Math.round(st.weight / 2.205);
+    document.getElementById('weightLabels').innerHTML = '<span>30 kg</span><span>200 kg</span>';
+  }
+  updateSlider('weight');
+}
+
+function getWeightKg() {
+  const raw = +document.getElementById('weightSlider').value;
+  return st.weightUnit === 'lb' ? raw / 2.205 : raw;
+}
+
+function calcularIMC() {
+  st.sexo = document.querySelector('[name="sexo"]:checked').value;
+  st.somato = document.querySelector('[name="somato"]:checked').value;
+  st.objetivo = document.querySelector('[name="objetivo"]:checked').value;
+  st.nivel = document.querySelector('[name="nivel"]:checked').value;
+  st.equipo = document.querySelector('[name="equipo"]:checked').value;
+
+  const peso = getWeightKg();
+  const talla = st.height / 100;
+  const imc = peso / (talla * talla);
+  const imcR = Math.round(imc * 10) / 10;
+
+  let tmb;
+  if (st.sexo === 'masculino') tmb = 88.362 + (13.397*peso) + (4.799*st.height) - (5.677*st.age);
+  else tmb = 447.593 + (9.247*peso) + (3.098*st.height) - (4.330*st.age);
+
+  const factors = [1.2,1.375,1.375,1.55,1.725,1.725,1.9];
+  const tdee = Math.round(tmb * factors[st.dias]);
+
+  let pi;
+  if (st.sexo === 'masculino') pi = Math.round(50 + 2.3*((st.height - 152.4)/2.54));
+  else pi = Math.round(45.5 + 2.3*((st.height - 152.4)/2.54));
+
+  const gc = Math.round((1.20*imc) + (0.23*st.age) - (10.8*(st.sexo==='masculino'?1:0)) - 5.4);
+
+  let cat, cls, desc;
+  if (imc < 18.5) { cat='Bajo Peso'; cls='bajo'; desc='Tu peso está por debajo del rango saludable para tu estatura.'; }
+  else if (imc < 25) { cat='Peso Normal ✓'; cls='normal'; desc='¡Excelente! Tu peso está dentro del rango saludable.'; }
+  else if (imc < 30) { cat='Sobrepeso'; cls='sobrepeso'; desc='Tu peso supera levemente el rango saludable recomendado.'; }
+  else if (imc < 35) { cat='Obesidad Grado I'; cls='obesidad1'; desc='Es importante tomar acción para mejorar tu salud.'; }
+  else { cat='Obesidad Grado II'; cls='obesidad2'; desc='Se recomienda atención médica profesional urgente.'; }
+
+  const pct = Math.min(100, Math.max(0, ((imc-15)/25)*100));
+
+  document.getElementById('imcValue').textContent = imcR;
+  document.getElementById('imcLabel').className = 'imc-label ' + cls;
+  document.getElementById('imcLabel').textContent = cat;
+  document.getElementById('imcDesc').textContent = desc;
+  setTimeout(() => { document.getElementById('imcPointer').style.left = pct + '%'; }, 300);
+
+  document.getElementById('statsGrid').innerHTML = [
+    {v: imcR, l:'Índice de Masa Corporal'},
+    {v: tdee+' kcal', l:'Calorías Mantenimiento'},
+    {v: pi+' kg', l:'Peso Ideal Estimado'},
+    {v: Math.max(0,gc)+'%', l:'Grasa Corporal Est.'}
+  ].map(s=>`<div class="stat-card"><div class="stat-value">${s.v}</div><div class="stat-label">${s.l}</div></div>`).join('');
+
+  const oL={perder_grasa:'🔥 Perder Grasa',ganar_musculo:'💪 Ganar Músculo',definicion:'⚡ Definición',salud_general:'❤️ Salud General',resistencia:'🏃 Resistencia',fuerza:'🏋️ Fuerza'};
+  const eL={gym_completo:'🏋️ Gym',mancuernas:'🔵 Mancuernas',cuerpo:'🤸 Sin equipo'};
+  const nL={principiante:'🌱 Principiante',intermedio:'⚙️ Intermedio',avanzado:'🏆 Avanzado'};
+  const soL={ectomorfo:'🏃 Ectomorfo',mesomorfo:'💪 Mesomorfo',endomorfo:'🏋️ Endomorfo'};
+  const dL=['😴 Sedentario','🚶 1d/sem','🚴 2d/sem','⚡ 3d/sem','💪 4d/sem','🔥 5d/sem','🏆 6d/sem'];
+
+  document.getElementById('profileChips').innerHTML = [
+    st.sexo==='masculino'?'♂ Masculino':'♀ Femenino',
+    st.age+' años', st.height+' cm', Math.round(peso)+' kg',
+    soL[st.somato], dL[st.dias], oL[st.objetivo], nL[st.nivel], eL[st.equipo]
+  ].map(c=>`<span class="chip">${c}</span>`).join('');
+
+  let am='', ac='alert-info';
+  if (imc < 18.5) { am='⚠️ Con bajo peso, enfócate en ganar masa muscular con superávit calórico y entrenamiento de fuerza progresivo.'; }
+  else if (cls==='normal') { am='✅ ¡Estás en el rango ideal! Tu plan optimizará tu composición corporal según tu objetivo.'; }
+  else { am='⚠️ Con IMC elevado, el plan priorizará pérdida de grasa con déficit calórico moderado y ejercicio cardiovascular.'; ac='alert-warn'; }
+  const ael = document.getElementById('metabolicAlert');
+  ael.className = 'alert ' + ac;
+  ael.textContent = am;
+
+  const exps = {
+    bajo:`Con un IMC de ${imcR}, estás por debajo del peso saludable. Puede indicar déficit nutricional o masa muscular baja. Tu plan se enfocará en aumentar calorías con alimentos de calidad y entrenamiento de fuerza progresivo. Calorías de mantenimiento: ${tdee} kcal/día.`,
+    normal:`¡Felicitaciones! Con un IMC de ${imcR} estás en el rango óptimo. Podemos mejorar tu composición (más músculo, menos grasa) según tu objetivo específico. Calorías de mantenimiento: ${tdee} kcal/día.`,
+    sobrepeso:`Con un IMC de ${imcR}, estás en sobrepeso. Un déficit de 300-500 kcal/día con ejercicio es la estrategia más efectiva y sostenible. Calorías de mantenimiento: ${tdee} kcal/día.`,
+    obesidad1:`Con un IMC de ${imcR} (Obesidad Grado I), es fundamental cambiar hábitos. Ejercicio aeróbico combinado con fuerza y dieta hipocalórica puede generar resultados en 3-6 meses. Calorías de mantenimiento: ${tdee} kcal/día.`,
+    obesidad2:`Con un IMC de ${imcR}, consulta con un médico antes de iniciar cualquier programa. El ejercicio de bajo impacto (caminata, natación, bicicleta estacionaria) es el punto de inicio más seguro. Calorías de mantenimiento: ${tdee} kcal/día.`
+  };
+  document.getElementById('imcExplanation').textContent = exps[cls] || exps.normal;
+
+  st._imc = imcR; st._cat = cat; st._tdee = tdee;
+  st._pesoIdeal = pi; st._grasaEst = Math.max(0,gc); st._peso = Math.round(peso);
+  goTo(4);
+}
+
+function generarPrompt() {
+  const oL={perder_grasa:'pérdida de grasa corporal',ganar_musculo:'ganancia de masa muscular',definicion:'definición y tonificación muscular',salud_general:'salud general y bienestar integral',resistencia:'resistencia cardiovascular y aeróbica',fuerza:'desarrollo de fuerza máxima'};
+  const nL={principiante:'principiante (0 a 6 meses de experiencia)',intermedio:'intermedio (6 meses a 2 años de experiencia)',avanzado:'avanzado (más de 2 años de entrenamiento constante)'};
+  const eL={gym_completo:'gimnasio completo con máquinas, barras olímpicas, pesas libres y poleas',mancuernas:'mancuernas y pesas libres en casa o gym básico',cuerpo:'solo peso corporal (calistenia), sin equipamiento adicional'};
+  const sL={ectomorfo:'ectomorfo — metabolismo muy rápido, estructura ósea pequeña, dificultad para ganar peso y músculo',mesomorfo:'mesomorfo — respuesta muscular rápida, buena constitución atlética natural, facilidad para ganar músculo',endomorfo:'endomorfo — metabolismo más lento, tendencia a acumular grasa especialmente en abdomen y caderas'};
+  const dL=['sedentario (no realiza actividad física)','1 día a la semana','2 días a la semana','3 días a la semana','4 días a la semana','5 días a la semana','6 días a la semana'];
+
+  let calObj = st._tdee;
+  if (st.objetivo==='perder_grasa') calObj = st._tdee - 400;
+  if (st.objetivo==='ganar_musculo') calObj = st._tdee + 300;
+  if (st._imc >= 30 && st.objetivo !== 'ganar_musculo') calObj = st._tdee - 500;
+  calObj = Math.max(1200, calObj);
+
+  let pm = 2.0;
+  if (st.objetivo==='ganar_musculo') pm = 2.2;
+  if (st.objetivo==='perder_grasa') pm = 2.4;
+  const prot = Math.round(st._peso * pm);
+  const carbs = Math.round((calObj * 0.40) / 4);
+  const grasas = Math.round((calObj * 0.25) / 9);
+
+  const prompt = `Eres un experto certificado en fitness, entrenamiento personalizado y nutrición deportiva. Crea un archivo HTML completo, visualmente impresionante, moderno, responsivo y totalmente funcional que contenga el plan de entrenamiento semanal y el plan nutricional personalizado para la siguiente persona. El archivo debe ser autocontenido (todo en un solo .html sin dependencias externas excepto Google Fonts).
+
+═══════════════════════════════════════════
+📊 DATOS PERSONALES Y FÍSICOS COMPLETOS
+═══════════════════════════════════════════
+• Edad: ${st.age} años
+• Sexo biológico: ${st.sexo}
+• Estatura: ${st.height} cm
+• Peso actual: ${st._peso} kg
+• Somatotipo: ${sL[st.somato]}
+• IMC calculado: ${st._imc} → Categoría: ${st._cat}
+• Grasa corporal estimada (Deurenberg): ${st._grasaEst}%
+• Peso ideal estimado (Devine): ${st._pesoIdeal} kg
+• Diferencia con peso ideal: ${st._peso - st._pesoIdeal > 0 ? '+' : ''}${st._peso - st._pesoIdeal} kg
+
+═══════════════════════════════════════════
+🎯 OBJETIVO, NIVEL Y PREFERENCIAS
+═══════════════════════════════════════════
+• Objetivo principal: ${oL[st.objetivo]}
+• Nivel de experiencia: ${nL[st.nivel]}
+• Frecuencia actual de entrenamiento: ${dL[st.dias]}
+• Equipamiento disponible: ${eL[st.equipo]}
+
+═══════════════════════════════════════════
+🔥 METABOLISMO Y MACRONUTRIENTES
+═══════════════════════════════════════════
+• TDEE (calorías mantenimiento/día): ${st._tdee} kcal
+• Calorías objetivo diarias: ${calObj} kcal
+• Proteínas diarias: ${prot} g/día (${Math.round(pm*10)/10}g por kg de peso)
+• Carbohidratos diarios: ${carbs} g/día (40% de calorías)
+• Grasas saludables diarias: ${grasas} g/día (25% de calorías)
+
+═══════════════════════════════════════════
+📋 ESTRUCTURA EXACTA DEL HTML A GENERAR
+═══════════════════════════════════════════
+
+El HTML debe tener navegación por pestañas o secciones con estas partes:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECCIÓN A — ENCABEZADO Y PERFIL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Título personalizado del plan
+- Tarjetas resumen con: IMC con indicador de color, peso/estatura/edad, calorías diarias objetivo, distribución de macros en barra visual
+- Barra de progreso visual del IMC (coloreada del blanco al rojo)
+- Mensaje motivacional personalizado según el objetivo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECCIÓN B — RUTINA SEMANAL (LUNES A SÁBADO + DOMINGO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para CADA día de Lunes a Sábado incluye:
+1. Nombre del día + grupo(s) muscular(es) trabajados
+2. Nivel de intensidad del día (baja/media/alta)
+3. CALENTAMIENTO específico (5-10 min): 3-4 ejercicios de movilidad articular y cardio suave
+4. BLOQUE PRINCIPAL: mínimo 6-8 ejercicios con:
+   - Nombre del ejercicio (en español e inglés)
+   - Descripción breve de ejecución correcta
+   - Series × Repeticiones (o tiempo)
+   - Descanso entre series
+   - Músculos trabajados (principal y secundario)
+   - Nivel de dificultad (⭐ a ⭐⭐⭐)
+5. TRABAJO DE CORE al final (si aplica): 2-3 ejercicios abdominales
+6. ENFRIAMIENTO: 5 min de estiramientos estáticos específicos
+
+Adapta la rutina al nivel "${nL[st.nivel]}" y equipamiento "${eL[st.equipo]}" y objetivo "${oL[st.objetivo]}".
+DOMINGO: Descanso activo con 5-8 ejercicios de movilidad, yoga o caminata.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECCIÓN C — PLAN NUTRICIONAL (LUNES A DOMINGO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Para CADA día de la semana incluye:
+• DESAYUNO (07:00-08:00): 2-3 alimentos con cantidad en gramos, calorías y macros
+• SNACK MAÑANA (10:00-10:30): 1-2 alimentos
+• ALMUERZO (12:30-13:30): plato principal con 3-4 componentes, gramos, calorías y macros
+• SNACK TARDE (16:00-16:30): 1-2 alimentos (pre-entreno si toca entrenar)
+• CENA (19:00-20:00): 2-3 alimentos más ligeros
+• TOTAL DEL DÍA: calorías totales y macros totales
+• HIDRATACIÓN: objetivo de agua (mínimo 2.5L)
+
+Objetivo calórico: ${calObj} kcal/día | Proteínas: ${prot}g | Carbos: ${carbs}g | Grasas: ${grasas}g
+Usa alimentos VARIADOS y accesibles en latinoamérica. No repitas menús consecutivos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECCIÓN D — CONSEJOS Y PROGRESIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. 6 TIPS específicos para somatotipo ${st.somato}
+2. SUPLEMENTACIÓN básica recomendada según objetivo (con dosis y horario)
+3. SEÑALES DE ALERTA a vigilar (sobreentrenamiento, fatiga, lesiones)
+4. PROGRESIÓN SUGERIDA semanas 1-4 / semanas 5-8
+5. HÁBITOS de sueño y recuperación esenciales
+6. Tabla de MEDIDAS semanales para tracking de progreso
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECCIÓN E — DESCARGO DE RESPONSABILIDAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Nota clara de que el plan es educativo y orientativo, no reemplaza consulta médica.
+
+═══════════════════════════════════════════
+🎨 DISEÑO DEL HTML
+═══════════════════════════════════════════
+- Tema oscuro con paleta naranja (#FF6B00 → #FF9D00 → blanco) como color principal
+- Fondo negro (#0a0a0f) con difuminado naranja suave
+- Tipografía: Bebas Neue para títulos + DM Sans para cuerpo (Google Fonts)
+- Tablas estilizadas con alternancia de filas
+- Tarjetas con efecto hover
+- Emojis estratégicos para hacer el contenido visual
+- 100% responsive para móvil
+- Navegación por pestañas: Entrenamiento / Nutrición / Consejos
+- Todo en UN SOLO archivo HTML
+
+Genera el HTML COMPLETO, exhaustivo, detallado, profesional y motivador.`;
+
+  document.getElementById('promptBox').innerHTML = prompt
+    .replace(/═══[^═\n]*/g, m => `<span class="prompt-section">${m}</span>`)
+    .replace(/━━━[^━\n]*/g, m => `<span class="prompt-section">${m}</span>`)
+    .replace(/•\s[^:]+:/g, m => `<span class="prompt-highlight">${m}</span>`);
+
+  st._prompt = prompt;
+  goTo(5);
+}
+
+function copyPrompt() {
+  if (!st._prompt) return;
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = st._prompt;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(st._prompt).then(showToast).catch(fallback);
+  } else fallback();
+}
+
+function showToast() {
+  const t = document.getElementById('copyToast');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 5000);
+}
+
+function resetAll() {
+  document.getElementById('ageSlider').value = 25;
+  document.getElementById('heightSlider').value = 170;
+  document.getElementById('weightSlider').value = 70;
+  document.getElementById('daysSlider').value = 3;
+  ['age','height','weight','days'].forEach(updateSlider);
+  document.querySelector('[name="sexo"][value="masculino"]').checked = true;
+  document.querySelector('[name="somato"][value="ectomorfo"]').checked = true;
+  document.querySelector('[name="objetivo"][value="perder_grasa"]').checked = true;
+  document.querySelector('[name="nivel"][value="principiante"]').checked = true;
+  document.querySelector('[name="equipo"][value="gym_completo"]').checked = true;
+}
+
+updateSlider('days');
+updateDaysDesc();
+</script>
+</body>
+</html>
