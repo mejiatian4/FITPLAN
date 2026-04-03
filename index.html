@@ -673,22 +673,26 @@
     </div>
     <div class="card">
       <div class="card-title">¡Listo! 🎉</div>
-      <div class="card-sub">Copia este prompt y pégalo en cualquier IA (ChatGPT, Claude, Gemini) para obtener tu plan completo en HTML con rutinas de lunes a sábado y nutrición de lunes a domingo.</div>
+      <div class="card-sub">Copia este prompt y pégalo en cualquier IA (ChatGPT, Claude, Gemini) para obtener tu plan completo en Markdown — luego lo pegas en Google Docs o Notion y lo exportas como PDF.</div>
       <div class="divider"></div>
       <div class="prompt-box" id="promptBox"></div>
       <div class="copy-toast" id="copyToast">✅ ¡Prompt copiado! Ahora pégalo en tu IA favorita.</div>
     </div>
     <button class="btn btn-copy" onclick="copyPrompt()">📋 COPIAR PROMPT COMPLETO</button>
     <div class="card" style="margin-top:20px;">
-      <div class="card-title" style="font-size:20px;">📌 ¿Cómo usar este prompt?</div>
-      <ol style="padding-left:20px;font-size:14px;line-height:2.2;color:var(--muted);">
-        <li>Presiona el botón <strong style="color:var(--text);">COPIAR PROMPT</strong> de arriba.</li>
-        <li>Abre <strong style="color:#ff9d00;">ChatGPT, Claude o Gemini</strong> en tu navegador.</li>
-        <li>Pega el prompt con <strong style="color:var(--text);">Ctrl+V</strong> y envíalo.</li>
-        <li>La IA generará un <strong style="color:#ff9d00;">archivo HTML completo</strong> con tu plan personalizado.</li>
-        <li>Guárdalo como <strong style="color:var(--text);">miplan.html</strong> y ábrelo en tu navegador.</li>
+      <div class="card-title" style="font-size:20px;">📌 ¿Cómo obtener tu PDF?</div>
+      <ol style="padding-left:20px;font-size:14px;line-height:2.4;color:var(--muted);">
+        <li>Presiona <strong style="color:var(--text);">COPIAR PROMPT</strong> arriba.</li>
+        <li>Abre <strong style="color:#ff9d00;">ChatGPT, Claude o Gemini</strong> en tu celular o navegador.</li>
+        <li>Pega el prompt y envíalo — la IA generará tu plan completo en Markdown.</li>
+        <li>Copia todo el texto que te devuelve la IA.</li>
+        <li>Pégalo en <strong style="color:#ff9d00;">Google Docs</strong> o <strong style="color:#ff9d00;">Notion</strong>.</li>
+        <li>Exporta como <strong style="color:var(--text);">PDF</strong> — se abre en cualquier iPhone o Android sin instalar nada.</li>
       </ol>
-      <div class="alert alert-warn" style="margin-top:12px;">
+      <div class="alert alert-info" style="margin-top:12px;">
+        💡 <strong>Tip:</strong> En Google Docs → <em>Archivo → Descargar → PDF</em>. En Notion → botón ··· → <em>Exportar → PDF</em>.
+      </div>
+      <div class="alert alert-warn" style="margin-top:10px;">
         ⚠️ Este plan es orientativo. Consulta con un médico, nutricionista o entrenador certificado antes de iniciar.
       </div>
     </div>
@@ -899,7 +903,7 @@ function generarPrompt() {
   const carbs = Math.round((calObj * 0.40) / 4);
   const grasas = Math.round((calObj * 0.25) / 9);
 
-  const prompt = `Eres un experto certificado en fitness, entrenamiento personalizado y nutrición deportiva. Crea un archivo HTML completo, visualmente impresionante, moderno, responsivo y totalmente funcional que contenga el plan de entrenamiento semanal y el plan nutricional personalizado para la siguiente persona. El archivo debe ser autocontenido (todo en un solo .html sin dependencias externas excepto Google Fonts).
+  const prompt = `Eres un experto certificado en fitness, entrenamiento personalizado y nutrición deportiva. Necesito que generes el contenido completo de un plan personalizado de entrenamiento y nutrición para la siguiente persona, formateado de manera clara, organizada y lista para convertir a PDF. Usa Markdown estándar (títulos con #, tablas, listas) para que se pueda pegar directamente en herramientas como Notion, Google Docs o cualquier conversor de Markdown a PDF. NO generes código HTML.
 
 ═══════════════════════════════════════════
 📊 DATOS PERSONALES Y FÍSICOS COMPLETOS
@@ -932,83 +936,81 @@ function generarPrompt() {
 • Grasas saludables diarias: ${grasas} g/día (25% de calorías)
 
 ═══════════════════════════════════════════
-📋 ESTRUCTURA EXACTA DEL HTML A GENERAR
+📋 ESTRUCTURA EXACTA DEL CONTENIDO A GENERAR
 ═══════════════════════════════════════════
 
-El HTML debe tener navegación por pestañas o secciones con estas partes:
+Genera el contenido dividido en estas secciones usando formato Markdown:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECCIÓN A — ENCABEZADO Y PERFIL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Título personalizado del plan
-- Tarjetas resumen con: IMC con indicador de color, peso/estatura/edad, calorías diarias objetivo, distribución de macros en barra visual
-- Barra de progreso visual del IMC (coloreada del blanco al rojo)
+- Título del plan con el nombre "FITPLAN — Plan Personalizado"
+- Tabla resumen con: IMC, categoría, peso, estatura, edad, calorías objetivo
+- Distribución de macros en formato de tabla (proteínas / carbos / grasas en gramos y porcentaje)
 - Mensaje motivacional personalizado según el objetivo
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECCIÓN B — RUTINA SEMANAL (LUNES A SÁBADO + DOMINGO)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Para CADA día de Lunes a Sábado incluye:
-1. Nombre del día + grupo(s) muscular(es) trabajados
-2. Nivel de intensidad del día (baja/media/alta)
-3. CALENTAMIENTO específico (5-10 min): 3-4 ejercicios de movilidad articular y cardio suave
-4. BLOQUE PRINCIPAL: mínimo 6-8 ejercicios con:
-   - Nombre del ejercicio (en español e inglés)
-   - Descripción breve de ejecución correcta
-   - Series × Repeticiones (o tiempo)
-   - Descanso entre series
-   - Músculos trabajados (principal y secundario)
-   - Nivel de dificultad (⭐ a ⭐⭐⭐)
-5. TRABAJO DE CORE al final (si aplica): 2-3 ejercicios abdominales
-6. ENFRIAMIENTO: 5 min de estiramientos estáticos específicos
+Para CADA día de Lunes a Sábado usa una tabla Markdown con columnas:
+| Ejercicio | Series × Reps | Descanso | Músculo Principal | Dificultad |
 
-Adapta la rutina al nivel "${nL[st.nivel]}" y equipamiento "${eL[st.equipo]}" y objetivo "${oL[st.objetivo]}".
-DOMINGO: Descanso activo con 5-8 ejercicios de movilidad, yoga o caminata.
+Incluye además:
+1. Nombre del día + grupo(s) muscular(es) trabajados
+2. Nivel de intensidad del día (Baja / Media / Alta)
+3. CALENTAMIENTO: 3-4 ejercicios de movilidad (5-10 min)
+4. BLOQUE PRINCIPAL: mínimo 6-8 ejercicios en tabla
+5. TRABAJO DE CORE: 2-3 ejercicios (si aplica)
+6. ENFRIAMIENTO: 5 min de estiramientos estáticos
+
+Adapta al nivel "${nL[st.nivel]}", equipamiento "${eL[st.equipo]}" y objetivo "${oL[st.objetivo]}".
+DOMINGO: Descanso activo — movilidad, yoga o caminata (sin pesas).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECCIÓN C — PLAN NUTRICIONAL (LUNES A DOMINGO)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Para CADA día de la semana incluye:
-• DESAYUNO (07:00-08:00): 2-3 alimentos con cantidad en gramos, calorías y macros
-• SNACK MAÑANA (10:00-10:30): 1-2 alimentos
-• ALMUERZO (12:30-13:30): plato principal con 3-4 componentes, gramos, calorías y macros
-• SNACK TARDE (16:00-16:30): 1-2 alimentos (pre-entreno si toca entrenar)
-• CENA (19:00-20:00): 2-3 alimentos más ligeros
-• TOTAL DEL DÍA: calorías totales y macros totales
-• HIDRATACIÓN: objetivo de agua (mínimo 2.5L)
+Para CADA día usa una tabla Markdown con columnas:
+| Comida | Hora | Alimento | Cantidad (g) | Calorías | Proteínas | Carbos | Grasas |
+
+Incluye estas comidas por día:
+• DESAYUNO (07:00-08:00)
+• SNACK MAÑANA (10:00-10:30)
+• ALMUERZO (12:30-13:30)
+• SNACK TARDE / PRE-ENTRENO (16:00-16:30)
+• CENA (19:00-20:00)
+• TOTAL DEL DÍA (fila de totales)
+• Nota de hidratación: mínimo 2.5L de agua
 
 Objetivo calórico: ${calObj} kcal/día | Proteínas: ${prot}g | Carbos: ${carbs}g | Grasas: ${grasas}g
-Usa alimentos VARIADOS y accesibles en latinoamérica. No repitas menús consecutivos.
+Usa alimentos VARIADOS y accesibles en latinoamérica. No repitas los mismos menús en días consecutivos.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECCIÓN D — CONSEJOS Y PROGRESIÓN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. 6 TIPS específicos para somatotipo ${st.somato}
-2. SUPLEMENTACIÓN básica recomendada según objetivo (con dosis y horario)
-3. SEÑALES DE ALERTA a vigilar (sobreentrenamiento, fatiga, lesiones)
-4. PROGRESIÓN SUGERIDA semanas 1-4 / semanas 5-8
+2. SUPLEMENTACIÓN recomendada según objetivo (tabla con: suplemento / dosis / horario)
+3. SEÑALES DE ALERTA de sobreentrenamiento y lesiones
+4. PLAN DE PROGRESIÓN: semanas 1-4 y semanas 5-8
 5. HÁBITOS de sueño y recuperación esenciales
 6. Tabla de MEDIDAS semanales para tracking de progreso
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SECCIÓN E — DESCARGO DE RESPONSABILIDAD
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Nota clara de que el plan es educativo y orientativo, no reemplaza consulta médica.
+Nota clara de que el plan es educativo y orientativo. No reemplaza consulta con médico, nutricionista o entrenador certificado.
 
 ═══════════════════════════════════════════
-🎨 DISEÑO DEL HTML
+📄 INSTRUCCIONES DE FORMATO PARA PDF
 ═══════════════════════════════════════════
-- Tema oscuro con paleta naranja (#FF6B00 → #FF9D00 → blanco) como color principal
-- Fondo negro (#0a0a0f) con difuminado naranja suave
-- Tipografía: Bebas Neue para títulos + DM Sans para cuerpo (Google Fonts)
-- Tablas estilizadas con alternancia de filas
-- Tarjetas con efecto hover
-- Emojis estratégicos para hacer el contenido visual
-- 100% responsive para móvil
-- Navegación por pestañas: Entrenamiento / Nutrición / Consejos
-- Todo en UN SOLO archivo HTML
+- Usa # para títulos principales, ## para secciones, ### para subsecciones
+- Usa tablas Markdown para ejercicios, nutrición y suplementación
+- Usa listas numeradas y con viñetas donde sea apropiado
+- Usa emojis para hacer el contenido más visual y amigable
+- Separa cada sección con una línea horizontal (---)
+- El resultado debe poder copiarse y pegarse en Google Docs, Notion o Word y quedar bien formateado
+- Cuando el usuario lo tenga en Google Docs o Notion, puede exportar directamente a PDF desde ahí
 
-Genera el HTML COMPLETO, exhaustivo, detallado, profesional y motivador.`;
+Genera el plan COMPLETO, exhaustivo, detallado, profesional y motivador en Markdown.`;
 
   document.getElementById('promptBox').innerHTML = prompt
     .replace(/═══[^═\n]*/g, m => `<span class="prompt-section">${m}</span>`)
