@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KROTON — Editor de Imágenes Instagram</title>
+<link rel="shortcut icon" href="img/favicon.png" type="img/png">
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Anton&family=Oswald:wght@400;600;700&family=Montserrat:wght@700;900&family=Barlow+Condensed:wght@700;900&family=Black+Han+Sans&family=Archivo+Black&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="ig-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+  </div>
+  <span style="font-size:11px;color:rgba(255,255,255,0.45)">KROTON Editor →</span>
+  <a href="https://www.instagram.com/krotonoficial/" target="_blank">@krotonoficial</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✦ Editor Feed Instagram ✦</div>
+  <h1>KROTON EDITOR</h1>
+  <p>Crea imágenes 4:5 para el feed. Arrastra texto, logo, emojis y formas. Descarga en 1080×1350px listo para Instagram.</p>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- CANVAS -->
+  <div class="canvas-col">
+    <div class="canvas-wrap">
+      <div id="stage">
+        <div class="bg-layer" id="bgLayer"></div>
+        <!-- Guías de alineación -->
+        <div class="guide v" id="guide-v-left"></div>
+        <div class="guide v" id="guide-v-center"></div>
+        <div class="guide v" id="guide-v-right"></div>
+        <div class="guide h" id="guide-h-top"></div>
+        <div class="guide h" id="guide-h-center"></div>
+        <div class="guide h" id="guide-h-bottom"></div>
+        <div class="guide v dashed" id="guide-v-other"></div>
+        <div class="guide h dashed" id="guide-h-other"></div>
+      </div>
+    </div>
+    <div class="drag-badge" id="dragBadge">0, 0</div>
+
+    <div class="canvas-actions">
+      <button onclick="duplicateSelected()">⎘ Duplicar</button>
+      <button onclick="deleteSelected()">🗑 Borrar</button>
+      <button onclick="bringToFront()">⬆ Al frente</button>
+      <button onclick="sendToBack()">⬇ Atrás</button>
+      <button class="btn-download" onclick="downloadImage()">⬇ DESCARGAR 1080×1350</button>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel-col">
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('agregar', this)">Agregar</button>
+      <button class="tab" onclick="switchTab('plantillas', this)">Plantillas</button>
+      <button class="tab" onclick="switchTab('editar', this)">Editar</button>
+    </div>
+
+    <!-- TAB AGREGAR -->
+    <div class="tab-content active" id="tab-agregar">
+
+      <div class="panel">
+        <div class="panel-title">✏️ Texto</div>
+        <div class="btn-grid cols-3">
+          <button class="tool-btn" onclick="addText('TITULAR','title')">
+            <span class="ico">T</span><span>Título</span>
+          </button>
+          <button class="tool-btn" onclick="addText('Subtítulo aquí','sub')">
+            <span class="ico">t</span><span>Subtítulo</span>
+          </button>
+          <button class="tool-btn" onclick="addText('TIP #1','tip')">
+            <span class="ico">💬</span><span>Etiqueta</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🖼️ Logo Kroton</div>
+        <div class="tog-row" style="margin-bottom:10px;">
+          <div>
+            <div style="font-size:12px;font-weight:600">Mostrar logo</div>
+            <div style="font-size:10px;color:var(--muted)">Aparece en la imagen final</div>
+          </div>
+          <label class="tog">
+            <input type="checkbox" id="logoToggle" onchange="toggleLogo()">
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+        <button class="tool-btn" style="width:100%" onclick="addLogo()">
+          <span class="ico">➕</span><span>Agregar Logo al Canvas</span>
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🖼️ Tu Imagen</div>
+        <label class="upload-area" id="uploadArea">
+          <div class="up-icon">📤</div>
+          <div class="up-text">Subir Imagen</div>
+          <div class="up-hint">PNG, JPG, GIF, WebP · Máx 10MB</div>
+          <input type="file" id="imgUpload" accept="image/*" multiple>
+        </label>
+        <div class="my-images-grid" id="myImagesGrid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">📸 Instagram</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Etiqueta oficial con @krotonoficial</p>
+        <div class="btn-grid">
+          <button class="tool-btn" onclick="addInstagramLabel('@krotonoficial')">
+            <span class="ico">📸</span><span>Ícono + Handle</span>
+          </button>
+          <button class="tool-btn" onclick="addInstagramLabel('krotonoficial', true)">
+            <span class="ico">🔖</span><span>Solo texto</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">😎 Emojis</div>
+        <div class="emoji-cat-tabs" id="emojiCatTabs"></div>
+        <div class="btn-grid cols-6" id="emojiGrid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">🔷 Formas</div>
+        <div class="btn-grid cols-4">
+          <button class="tool-btn" onclick="addShape('rect')"><span class="ico">▭</span><span>Rect</span></button>
+          <button class="tool-btn" onclick="addShape('circle')"><span class="ico">●</span><span>Círculo</span></button>
+          <button class="tool-btn" onclick="addShape('triangle')"><span class="ico">▲</span><span>Triáng.</span></button>
+          <button class="tool-btn" onclick="addShape('star')"><span class="ico">★</span><span>Estrella</span></button>
+          <button class="tool-btn" onclick="addShape('arrow-r')"><span class="ico">→</span><span>Flecha →</span></button>
+          <button class="tool-btn" onclick="addShape('arrow-l')"><span class="ico">←</span><span>Flecha ←</span></button>
+          <button class="tool-btn" onclick="addShape('arrow-u')"><span class="ico">↑</span><span>Flecha ↑</span></button>
+          <button class="tool-btn" onclick="addShape('arrow-d')"><span class="ico">↓</span><span>Flecha ↓</span></button>
+          <button class="tool-btn" onclick="addShape('line')"><span class="ico">━</span><span>Línea</span></button>
+          <button class="tool-btn" onclick="addShape('burst')"><span class="ico">✦</span><span>Estallar</span></button>
+          <button class="tool-btn" onclick="addShape('heart')"><span class="ico">♥</span><span>Corazón</span></button>
+          <button class="tool-btn" onclick="addShape('check')"><span class="ico">✓</span><span>Check</span></button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB PLANTILLAS -->
+    <div class="tab-content" id="tab-plantillas">
+      <div class="panel">
+        <div class="panel-title">🎨 Plantillas de Fondo</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">12 estilos — naranja, blanco y negro</p>
+        <div class="tpl-grid" id="tplGrid"></div>
+      </div>
+    </div>
+
+    <!-- TAB EDITAR -->
+    <div class="tab-content" id="tab-editar">
+
+      <div class="panel" id="emptyEditPanel">
+        <div class="empty-hint">
+          👆 Selecciona un elemento del canvas<br>para editarlo
+        </div>
+      </div>
+
+      <div class="panel" id="editTextPanel" style="display:none">
+        <div class="panel-title">✏️ Editar Texto</div>
+        <div class="field">
+          <label>Contenido</label>
+          <textarea id="eTxtContent" oninput="updateSelectedText()"></textarea>
+        </div>
+        <div class="field">
+          <label>Fuente</label>
+          <select id="eTxtFont" onchange="updateSelectedText()">
+            <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+            <option value="'Anton', sans-serif">Anton</option>
+            <option value="'Archivo Black', sans-serif">Archivo Black</option>
+            <option value="'Oswald', sans-serif">Oswald</option>
+            <option value="'Montserrat', sans-serif">Montserrat</option>
+            <option value="'Barlow Condensed', sans-serif">Barlow Condensed</option>
+            <option value="'Black Han Sans', sans-serif">Black Han Sans</option>
+            <option value="'Rubik Mono One', sans-serif">Rubik Mono</option>
+            <option value="'DM Sans', sans-serif">DM Sans</option>
+            <option value="'Space Mono', monospace">Space Mono</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tamaño <span class="slider-val" id="eTxtSizeVal">48px</span></label>
+          <div class="slider-row">
+            <input type="range" id="eTxtSize" min="14" max="180" value="48" oninput="updateSelectedText()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Peso</label>
+          <select id="eTxtWeight" onchange="updateSelectedText()">
+            <option value="400">Normal (400)</option>
+            <option value="600">Semibold (600)</option>
+            <option value="700" selected>Bold (700)</option>
+            <option value="900">Black (900)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Alineación</label>
+          <div class="btn-grid cols-3">
+            <button class="tool-btn" id="al-l" onclick="setTextAlign('left')">⬅ Izq</button>
+            <button class="tool-btn sel" id="al-c" onclick="setTextAlign('center')">⬆ Centro</button>
+            <button class="tool-btn" id="al-r" onclick="setTextAlign('right')">Der ➡</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Color del texto</label>
+          <div class="color-row" id="eTxtColorRow"></div>
+        </div>
+        <div class="tog-row" style="margin-top:8px;">
+          <div>
+            <div style="font-size:12px;font-weight:600">Contorno negro</div>
+            <div style="font-size:10px;color:var(--muted)">Mejora la legibilidad</div>
+          </div>
+          <label class="tog">
+            <input type="checkbox" id="eTxtStroke" onchange="updateSelectedText()">
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+        <div class="tog-row" style="margin-top:6px;">
+          <div>
+            <div style="font-size:12px;font-weight:600">Fondo amarillo</div>
+            <div style="font-size:10px;color:var(--muted)">Pastilla tipo etiqueta</div>
+          </div>
+          <label class="tog">
+            <input type="checkbox" id="eTxtBg" onchange="updateSelectedText()">
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel" id="editShapePanel" style="display:none">
+        <div class="panel-title">🔷 Editar Forma</div>
+        <div class="field">
+          <label>Color</label>
+          <div class="color-row" id="eShapeColorRow"></div>
+        </div>
+        <div class="field">
+          <label>Grosor de trazo <span class="slider-val" id="eShapeStrokeVal">0px</span></label>
+          <div class="slider-row">
+            <input type="range" id="eShapeStroke" min="0" max="20" value="0" oninput="updateSelectedShape()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Relleno</label>
+          <div class="btn-grid">
+            <button class="tool-btn sel" id="fillFull" onclick="setShapeFill('full')">Sólido</button>
+            <button class="tool-btn" id="fillNone" onclick="setShapeFill('none')">Solo contorno</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Opacidad <span class="slider-val" id="eShapeOpVal">100%</span></label>
+          <div class="slider-row">
+            <input type="range" id="eShapeOp" min="10" max="100" value="100" oninput="updateSelectedShape()">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="editLogoPanel" style="display:none">
+        <div class="panel-title">🖼️ Editar Logo</div>
+        <div class="field">
+          <label>Opacidad <span class="slider-val" id="eLogoOpVal">100%</span></label>
+          <div class="slider-row">
+            <input type="range" id="eLogoOp" min="20" max="100" value="100" oninput="updateSelectedLogo()">
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--muted)">Arrastra la esquina amarilla para redimensionar.</p>
+      </div>
+
+      <div class="panel" id="editImagePanel" style="display:none">
+        <div class="panel-title">🖼️ Editar Imagen</div>
+        <div class="field">
+          <label>Ajuste de imagen</label>
+          <div class="btn-grid cols-3">
+            <button class="tool-btn" id="fit-contain" onclick="setImageFit('contain')">Ajustar</button>
+            <button class="tool-btn" id="fit-cover" onclick="setImageFit('cover')">Rellenar</button>
+            <button class="tool-btn" id="fit-fill" onclick="setImageFit('fill')">Estirar</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Opacidad <span class="slider-val" id="eImgOpVal">100%</span></label>
+          <div class="slider-row">
+            <input type="range" id="eImgOp" min="10" max="100" value="100" oninput="updateSelectedImage()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Bordes redondeados <span class="slider-val" id="eImgRadiusVal">0px</span></label>
+          <div class="slider-row">
+            <input type="range" id="eImgRadius" min="0" max="100" value="0" oninput="updateSelectedImage()">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="editEmojiPanel" style="display:none">
+        <div class="panel-title">😎 Editar Emoji</div>
+        <div class="field">
+          <label>Cambiar emoji</label>
+          <input type="text" id="eEmojiChar" maxlength="4" oninput="updateSelectedEmoji()">
+        </div>
+        <div class="field">
+          <label>Tamaño <span class="slider-val" id="eEmojiSizeVal">80px</span></label>
+          <div class="slider-row">
+            <input type="range" id="eEmojiSize" min="30" max="300" value="80" oninput="updateSelectedEmoji()">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="editIgLabelPanel" style="display:none">
+        <div class="panel-title">📸 Editar Instagram</div>
+        <div class="field">
+          <label>Handle</label>
+          <input type="text" id="eIgText" oninput="updateSelectedIgLabel()">
+        </div>
+        <div class="field">
+          <label>Tamaño <span class="slider-val" id="eIgSizeVal">16px</span></label>
+          <div class="slider-row">
+            <input type="range" id="eIgSize" min="10" max="40" value="16" oninput="updateSelectedIgLabel()">
+          </div>
+        </div>
+        <div class="tog-row">
+          <div><div style="font-size:12px;font-weight:600">Mostrar ícono</div></div>
+          <label class="tog">
+            <input type="checkbox" id="eIgShowIcon" checked onchange="updateSelectedIgLabel()">
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+        <div class="tog-row">
+          <div><div style="font-size:12px;font-weight:600">Fondo oscuro</div></div>
+          <label class="tog">
+            <input type="checkbox" id="eIgBg" checked onchange="updateSelectedIgLabel()">
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel" id="commonEditPanel" style="display:none">
+        <div class="panel-title">🔄 Rotación y Posición</div>
+        <div class="field">
+          <label>Rotación <span class="slider-val" id="eRotVal">0°</span></label>
+          <div class="slider-row">
+            <input type="range" id="eRot" min="-180" max="180" value="0" oninput="updateSelectedRotation()">
+          </div>
+        </div>
+        <div class="divider-soft"></div>
+        <div class="btn-grid">
+          <button class="tool-btn" onclick="centerSelectedH()">↔ Centrar H</button>
+          <button class="tool-btn" onclick="centerSelectedV()">↕ Centrar V</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📑 Capas</div>
+      <div class="layers-list" id="layersList">
+        <div class="empty-hint">Sin elementos aún</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <strong>KROTON · EDITOR</strong><br>
+  Editor de Imágenes para Feed Instagram · 1080×1350px<br>
+  <a href="https://www.instagram.com/krotonoficial/" target="_blank">📸 instagram.com/krotonoficial</a>
+</footer>
+
+<div class="toast" id="toast">✅ ¡Imagen descargada!</div>
+
+</body>
+</html>
+
+<script src="scripts/scripts.js"></script>
